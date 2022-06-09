@@ -41,13 +41,13 @@ class Start():
         
 
         self.lbl_heading_start = Label(self.start_frame,
-                                    text='Witaj w kinie')
+                                    text='Welcome to the cinema')
         self.lbl_heading_start.pack(pady=20)
-        self.lbl_login_start_log=Label(self.start_frame,text='Login dla pracowników').pack()
+        self.lbl_login_start_log=Label(self.start_frame,text='Login for staff').pack()
         self.login_btn_start=Button(self.start_frame,text='Login',command=self.switch_to_login)
         self.login_btn_start.pack()
-        self.lbl_login_start_use=Label(self.start_frame,text='Przegladaj filmy i seanse').pack()
-        self.seans_btn_start=Button(self.start_frame,text='Przegladaj',command=self.switch_to_seanse)
+        self.lbl_login_start_use=Label(self.start_frame,text='Browse movies and Seances').pack()
+        self.seans_btn_start=Button(self.start_frame,text='Browse',command=self.switch_to_seanse)
         
         self.seans_btn_start.pack()
     
@@ -65,15 +65,15 @@ class Login():
         self.login_frame=Frame(master)
         self.login_frame.pack()
 
-        self.lbl_login_id=Label(self.login_frame,text='wpisz id:').pack()
+        self.lbl_login_id=Label(self.login_frame,text='Id:').pack()
         self.e_login_id=Entry(self.login_frame)
         self.e_login_id.pack()
-        self.lbl_login_pswd=Label(self.login_frame,text='wpisz haslo:').pack()
+        self.lbl_login_pswd=Label(self.login_frame,text='Password:').pack()
         self.e_login_pswd=Entry(self.login_frame)
         self.e_login_pswd.pack()
-        self.btn_login_enter=Button(self.login_frame,text='Dalej',command=self.login).pack()
-        self.btn_login_back=Button(self.login_frame,text='Powrot do startu',command=self.back_to_start).pack()
-        self.lbl_login_tip=Label(self.login_frame,text='psst.. you can just leave it empty and press "Dalej" ').pack()
+        self.btn_login_enter=Button(self.login_frame,text='OK',command=self.login).pack()
+        self.btn_login_back=Button(self.login_frame,text='Back to start',command=self.back_to_start).pack()
+        self.lbl_login_tip=Label(self.login_frame,text='psst.. you can just leave it empty and press "OK" ').pack()
     def back_to_start(self):
         self.login_frame.forget()
         Start(root)
@@ -93,9 +93,9 @@ class Login():
                 self.login_frame.forget()
                 Admin(root)
         if id not in  data[:][0]:
-            lbl_login_err=Label(self.login_frame,text='Zly login').pack()
+            lbl_login_err=Label(self.login_frame,text='Wrong login').pack()
         if pswd not in  data[:][1]:
-            lbl_login_err1=Label(self.login_frame,text='Zle haslo').pack()
+            lbl_login_err1=Label(self.login_frame,text='Wrong password').pack()
 
 
 
@@ -105,11 +105,11 @@ class Admin():
         self.admin_frame=Frame(master)
         self.admin_frame.pack()
 
-        self.lbl_admin=Label(self.admin_frame,text='Wybierz opcję:').pack()
-        self.btn_admin_accept_req=Button(self.admin_frame,text='Akceptuj zamowienia',command=self.switch_to_accept).pack()
-        self.btn_admin_add_seans=Button(self.admin_frame,text='Dodawanie seansow',command=self.switch_to_add_seans).pack()
-        self.btn_admin_add_admin=Button(self.admin_frame,text='Dodawanie pracownikow',command=self.switch_to_add_admin).pack()
-        self.btn_admin_back=Button(self.admin_frame,text='Powrot',command=self.back_to_login).pack()
+        self.lbl_admin=Label(self.admin_frame,text='Select an option:').pack()
+        self.btn_admin_accept_req=Button(self.admin_frame,text='Review orders',command=self.switch_to_accept).pack()
+        self.btn_admin_add_seans=Button(self.admin_frame,text='Add Seances',command=self.switch_to_add_seans).pack()
+        self.btn_admin_add_admin=Button(self.admin_frame,text='Add staff members',command=self.switch_to_add_admin).pack()
+        self.btn_admin_back=Button(self.admin_frame,text='<- Back',command=self.back_to_login).pack()
     def switch_to_accept(self):
         self.admin_frame.forget()
         Accept(root)
@@ -128,11 +128,11 @@ class Accept():
     def __init__(self,master):
         self.accept_frame=Frame(master)
         self.accept_frame.pack()
-        self.lbl_accept=Label(self.accept_frame,text='Akceptowanie zamowien').grid(row=0,column=0,columnspan=4)
+        self.lbl_accept=Label(self.accept_frame,text='Accepting orders').grid(row=0,column=0,columnspan=4)
         self.lbl_accept_desc_id=Label(self.accept_frame,text='Id:').grid(row=1,column=0)
-        self.lbl_accept_desc_id=Label(self.accept_frame,text='Id seansu:').grid(row=1,column=1)
-        self.lbl_accept_desc_id=Label(self.accept_frame,text='Zamowione miejsca:').grid(row=1,column=2)
-        self.lbl_accept_desc_id=Label(self.accept_frame,text='Wolne miejsca:').grid(row=1,column=3)
+        self.lbl_accept_desc_id=Label(self.accept_frame,text='Seance id:').grid(row=1,column=1)
+        self.lbl_accept_desc_id=Label(self.accept_frame,text='Ordered seats:').grid(row=1,column=2)
+        self.lbl_accept_desc_id=Label(self.accept_frame,text='Free seats:').grid(row=1,column=3)
 
         c.execute("select * from ocz_rezerwacje")
         pending=c.fetchall()
@@ -141,7 +141,7 @@ class Accept():
         #button dictionary sounds weird but works
         self.button_dict={}
         for res in pending:
-            self.button_dict[f'btn_accept{res[0]}']=Button(self.accept_frame,text='Akceptuj',command=lambda res=res: self.accept(res))
+            self.button_dict[f'btn_accept{res[0]}']=Button(self.accept_frame,text='Accept',command=lambda res=res: self.accept(res))
 
         count=2
         for res in pending:
@@ -191,34 +191,34 @@ class Add_seanse():
         self.add_seanse_frame=Frame(master)
         self.add_seanse_frame.pack()
 
-        self.lbl_add_seans=Label(self.add_seanse_frame,text='Dodawanie seansow').pack()
+        self.lbl_add_seans=Label(self.add_seanse_frame,text='Add seances').pack()
 
-        self.lbl_title=Label(self.add_seanse_frame,text='Wpisz tytul').pack()
+        self.lbl_title=Label(self.add_seanse_frame,text='Title').pack()
         self.e_add_title=Entry(self.add_seanse_frame)
         self.e_add_title.pack()
 
-        self.lbl_time=Label(self.add_seanse_frame,text="Wpisz czas rozpoczecia (YYYY-MM-DD HH:MM:SS").pack()
+        self.lbl_time=Label(self.add_seanse_frame,text="Date and time (YYYY-MM-DD HH:MM:SS").pack()
         self.e_add_time=Entry(self.add_seanse_frame)
         self.e_add_time.pack()
 
-        self.lbl_room=Label(self.add_seanse_frame,text='Wpisz numer sali').pack()
+        self.lbl_room=Label(self.add_seanse_frame,text='Room nr (1-5)').pack()
         self.e_add_room=Entry(self.add_seanse_frame)
         self.e_add_room.pack()
 
         
         
 
-        self.btn_add=Button(self.add_seanse_frame,text="Dodaj seans",command=self.add).pack()
+        self.btn_add=Button(self.add_seanse_frame,text="Add seance",command=self.add).pack()
 
         
 
-        self.btn_add_seans_back=Button(self.add_seanse_frame,text='Powrot do wyboru',command=self.back_to_admin).pack()
+        self.btn_add_seans_back=Button(self.add_seanse_frame,text='<- Back',command=self.back_to_admin).pack()
     def add(self):
         global c
         title=self.e_add_title.get()
         time=self.e_add_time.get()
         room=self.e_add_room.get()
-        self.lbl_add_seans_err=Label(self.add_seanse_frame,text='Nie ma takiej sali')
+        self.lbl_add_seans_err=Label(self.add_seanse_frame,text='There is no such room')
         self.lbl_add_seans_err.forget()
         rooms=[1,2,3,4,5]
 
@@ -226,7 +226,7 @@ class Add_seanse():
             
             c.execute("Select add_seans('{a}','{b}','{c}')".format(a=title,b=time,c=room))
             result=c.fetchall()
-            self.lbl_succesr=Label(self.add_seanse_frame,text='Dodano Seans z id {}'.format(result[0][0])).pack()
+            self.lbl_succesr=Label(self.add_seanse_frame,text='Seance with id {} has been added'.format(result[0][0])).pack()
 
 
         elif (int(room) not in rooms):
@@ -247,23 +247,23 @@ class Add_admin():
 
 
 
-        self.lbl_add_admin=Label(self.add_admin_frame,text='Dodawanie pracownikow').pack()
-        self.lbl_name=Label(self.add_admin_frame,text='Wpisz imie nowego pracownika').pack()
+        self.lbl_add_admin=Label(self.add_admin_frame,text='Add staff members').pack()
+        self.lbl_name=Label(self.add_admin_frame,text='Name:').pack()
         self.e_name=Entry(self.add_admin_frame)
         self.e_name.pack()
-        self.lbl_surname=Label(self.add_admin_frame,text='Wpisz nazwisko nowego pracownika').pack()
+        self.lbl_surname=Label(self.add_admin_frame,text='Surname:').pack()
         self.e_surname=Entry(self.add_admin_frame)
         self.e_surname.pack()
-        self.lbl_id=Label(self.add_admin_frame,text='Wpisz id nowego pracownika (6 cyfr)').pack()
+        self.lbl_id=Label(self.add_admin_frame,text='New id (6 numbers)').pack()
         self.e_id=Entry(self.add_admin_frame)
         self.e_id.pack()
-        self.lbl_pswd=Label(self.add_admin_frame,text='Wpisz haslo dla nowego pracownika').pack()
+        self.lbl_pswd=Label(self.add_admin_frame,text='New password').pack()
         self.e_pswd=Entry(self.add_admin_frame)
         self.e_pswd.pack()
-        self.btn_add=Button(self.add_admin_frame,text='Dodaj',command=self.add).pack()
+        self.btn_add=Button(self.add_admin_frame,text='Add',command=self.add).pack()
         self.lbl_empty=Label(self.add_admin_frame,text=' ').pack()
 
-        self.btn_add_admin_back=Button(self.add_admin_frame,text='powrot do wyboru', command=self.back_to_admin).pack()
+        self.btn_add_admin_back=Button(self.add_admin_frame,text='<- Back', command=self.back_to_admin).pack()
     def add(self):
         name=self.e_name.get()
         surname=self.e_surname.get()
@@ -271,7 +271,7 @@ class Add_admin():
         pswd=self.e_pswd.get()
         
         c.execute("Insert into pracownicy values ('{a}','{b}','{c}','{d}')".format(a=id,b=pswd,c=name,d=surname))
-        self.lbl_succes=Label(self.add_admin_frame,text='Dodano pracownika').pack()
+        self.lbl_succes=Label(self.add_admin_frame,text='Staff member has been added').pack()
     
     def back_to_admin(self):
         self.add_admin_frame.forget()
@@ -283,7 +283,7 @@ class Seanse():
         self.seanse_frame=Frame(master)
         self.seanse_frame.pack()
         
-        self.lbl_seanse=Label(self.seanse_frame,text='Dostepne filmy:').grid(row=0,column=0,columnspan=2)
+        self.lbl_seanse=Label(self.seanse_frame,text='Available movies:').grid(row=0,column=0,columnspan=2)
         c.execute("select tytul, opis, czas_wyswietlania from filmy")
         self.list=c.fetchall()
      
@@ -292,23 +292,23 @@ class Seanse():
            
             Label(self.seanse_frame,text='{}'.format(i[0])).grid(row=count,column=0)
             Button(self.seanse_frame,text='info',command=lambda i=i: self.show_info(i[0],i[1],i[2])).grid(row=count,column=1)
-            Button(self.seanse_frame,text='Seanse',command=lambda i=i: self.show_seans(i[0])).grid(row=count,column=2)
+            Button(self.seanse_frame,text='Seances',command=lambda i=i: self.show_seans(i[0])).grid(row=count,column=2)
             count+=1
 
-        self.btn_seanse_back=Button(self.seanse_frame,text='Powrot',command=self.back_to_start).grid(row=count,column=1)
+        self.btn_seanse_back=Button(self.seanse_frame,text='<- Back',command=self.back_to_start).grid(row=count,column=1)
 
     def show_info(self,title,desc,time):
         global root
         self.movie_frame=Frame(root)
         self.movie_frame.pack()
         self.lbl_mv_title=Label(self.movie_frame,text=title).grid(row=0,column=0,columnspan=2)
-        self.lbl_mv_desc=Label(self.movie_frame,text="OPIS:").grid(row=1,column=0)
+        self.lbl_mv_desc=Label(self.movie_frame,text="Description:").grid(row=1,column=0)
         self.lbl_mv_desc1=Label(self.movie_frame,text=desc).grid(row=2,column=0)
-        self.lbl_mv_time=Label(self.movie_frame,text='CZAS WYSWIETLANIA:').grid(row=1,column=1)
+        self.lbl_mv_time=Label(self.movie_frame,text='Duration:').grid(row=1,column=1)
         self.lbl_mv_time=Label(self.movie_frame,text='{} min'.format(time)).grid(row=2,column=1)
         
 
-        self.btn_mv_back=Button(self.movie_frame,text='Powrot',command=self.mv_back).grid(row=3,column=1)
+        self.btn_mv_back=Button(self.movie_frame,text='<- Back',command=self.mv_back).grid(row=3,column=1)
         self.seanse_frame.forget()
     
     def show_seans(self,title):
@@ -317,17 +317,17 @@ class Seanse():
         self.seanse_frame.forget()
         self.show_seanse_frame=Frame(root)
         self.show_seanse_frame.pack()
-        self.lbl_show_time=Label(self.show_seanse_frame,text='Data i godzina wyswietlania:').grid(row=0,column=0)
-        self.lbl_show_room=Label(self.show_seanse_frame,text='Nr sali:').grid(row=0,column=1)
-        self.lbl_show_seats=Label(self.show_seanse_frame,text='Wpisz ile chcesz miejsc').grid(row=0,column=3)
-        self.lbl_show_freeseats=Label(self.show_seanse_frame,text='Wolne miejsca:').grid(row=0,column=2)
+        self.lbl_show_time=Label(self.show_seanse_frame,text='Date and time:').grid(row=0,column=0)
+        self.lbl_show_room=Label(self.show_seanse_frame,text='Room nr:').grid(row=0,column=1)
+        self.lbl_show_seats=Label(self.show_seanse_frame,text='How many seats to order?').grid(row=0,column=3)
+        self.lbl_show_freeseats=Label(self.show_seanse_frame,text='Free seats:').grid(row=0,column=2)
         self.count1=1
 
         #this label is defined here but used in another function (reserve)
         #I have no idea why but apparently if a widget is defined inside a function
         #then it cannot be removed with .grid_forget().
         #tkinter is a bit buggy
-        self.lbl_res_err=Label(self.show_seanse_frame,text='Nie ma tyle miejsc')
+        self.lbl_res_err=Label(self.show_seanse_frame,text='Not enough seats available')
          #the rest is where it belongs
 
         for k in data:
@@ -351,9 +351,9 @@ class Seanse():
             # Button is not in exec because for some reason
             # exec doesn't allow the 'lambda k=k' trick. 
             # Luckily buttons dont have to be distinguishible
-            Button(self.show_seanse_frame,text="Wybierz",command= lambda k=k: self.reserve(k[2])).grid(row=self.count1,column=4)
+            Button(self.show_seanse_frame,text="Reserve",command= lambda k=k: self.reserve(k[2])).grid(row=self.count1,column=4)
             self.count1+=1
-        self.btn_show_seans_back=Button(self.show_seanse_frame,text='Powrot',command=self.sh_back).grid(row=100,column=2)
+        self.btn_show_seans_back=Button(self.show_seanse_frame,text='<- Back',command=self.sh_back).grid(row=100,column=2)
     def reserve(self,id):
         
         
@@ -376,8 +376,8 @@ class Seanse():
             pending=c.fetchall()
             exec(f'self.e_seats_{id}.delete(0,END)')
             exec(f'self.e_seats_{id}.insert(0,"Zarezerwowano!")')
-            Label(self.show_seanse_frame,text="Twoja rezerwacja oczekuje na zaakceptowanie przez pracownika.").grid(row=self.count1,column=0,columnspan=5)
-            Label(self.show_seanse_frame,text=f" Numer twojej rezerwacji to {pending[0][0]}").grid(row=self.count1+1,column=0,columnspan=5)
+            Label(self.show_seanse_frame,text="Your order is waiting for staff member to review.").grid(row=self.count1,column=0,columnspan=5)
+            Label(self.show_seanse_frame,text=f"Your reservation number is {pending[0][0]}").grid(row=self.count1+1,column=0,columnspan=5)
 
 
 
