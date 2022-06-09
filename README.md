@@ -3,9 +3,10 @@
 It's intented to mimic a cinema.
 
 Exam session is coming up which means i dont have the time to add exception errors (please type carefully ).
-edit: added some
+\\edit: added some\\
 
 Also there's no restrictions regarding reservations limit,
-edit: added
+\\edit: added\\
+
 Same goes for an ERD (I have one but half of it was made in paint). 
 Part of the code is written in Polish because I'll use it as a project for my finals, you must forgive me. I'll translate and comment everything this weekend.
