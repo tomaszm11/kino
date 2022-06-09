@@ -17,8 +17,6 @@ def center_window_on_screen():
 
 
 
-for i in range(5): print(i)
-
 
 root = Tk()
 root.title("Kino")
@@ -75,6 +73,7 @@ class Login():
         self.e_login_pswd.pack()
         self.btn_login_enter=Button(self.login_frame,text='Dalej',command=self.login).pack()
         self.btn_login_back=Button(self.login_frame,text='Powrot do startu',command=self.back_to_start).pack()
+        self.lbl_login_tip=Label(self.login_frame,text='psst.. you can just leave it empty and press "Dalej" ').pack()
     def back_to_start(self):
         self.login_frame.forget()
         Start(root)
@@ -323,7 +322,14 @@ class Seanse():
         self.lbl_show_seats=Label(self.show_seanse_frame,text='Wpisz ile chcesz miejsc').grid(row=0,column=3)
         self.lbl_show_freeseats=Label(self.show_seanse_frame,text='Wolne miejsca:').grid(row=0,column=2)
         self.count1=1
-        
+
+        #this label is defined here but used in another function (reserve)
+        #I have no idea why but apparently if a widget is defined inside a function
+        #then it cannot be removed with .grid_forget().
+        #tkinter is a bit buggy
+        self.lbl_res_err=Label(self.show_seanse_frame,text='Nie ma tyle miejsc')
+         #the rest is where it belongs
+
         for k in data:
             
             exec(f'self.lbl_time_{k[2]}=Label(self.show_seanse_frame,text=k[0]).grid(row=self.count1,column=0)')
@@ -351,17 +357,19 @@ class Seanse():
     def reserve(self,id):
         
         
-
+        #temporary solution to put data inside if statement
         a=[]
         b=[]
+
         exec(f'a.append(self.e_seats_{id}.get())')
         exec(f'b.append(self.free_seats_{id})')
 
-        lbl_res_err=Label(self.show_seanse_frame,text='Nie ma tyle miejsc')
-        lbl_res_err.grid_forget()
+        
+        self.lbl_res_err.grid_forget()
+        # and the data gets written in a weird way. I'll leave it as is since im not using it anywhere else
         if int(a[0])>b[0][0][0]:
             
-            lbl_res_err.grid(row=101,column=0,columnspan=5)
+            self.lbl_res_err.grid(row=101,column=0,columnspan=5)
         else:
         
             c.execute(f"insert into ocz_rezerwacje(zajmowane_miejsca,rez_seans) values('{a[0]}','{id}') returning id_ocz_rezerwacji")
@@ -370,6 +378,7 @@ class Seanse():
             exec(f'self.e_seats_{id}.insert(0,"Zarezerwowano!")')
             Label(self.show_seanse_frame,text="Twoja rezerwacja oczekuje na zaakceptowanie przez pracownika.").grid(row=self.count1,column=0,columnspan=5)
             Label(self.show_seanse_frame,text=f" Numer twojej rezerwacji to {pending[0][0]}").grid(row=self.count1+1,column=0,columnspan=5)
+
 
 
 
