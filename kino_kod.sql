@@ -62,6 +62,15 @@ RETURNS bigint AS $$
     as foo1 group by liczba_miejsc;
 $$ LANGUAGE 'sql';
 
+CREATE OR REPLACE FUNCTION sprawdz_ocz_miejsca (seans_var integer)
+RETURNS bigint AS $$
+	select (liczba_miejsc - SUM(zajmowane_miejsca)) AS result from 
+    (select id_ocz_rezerwacji,zajmowane_miejsca,numer_sali,liczba_miejsc,id_seansu 
+    from ocz_rezerwacje left join (select sale.numer_sali,sale.liczba_miejsc,seanse.id_seansu
+    from sale right join seanse on numer_sali=sea_sala) as foo on rez_seans=id_seansu where id_seansu=seans_var)
+    as foo1 group by liczba_miejsc;
+$$ LANGUAGE 'sql';
+
 
 
 CREATE OR REPLACE FUNCTION sprawdz_rezerwowane_miejsca (seans_var integer)
@@ -72,10 +81,6 @@ RETURNS bigint AS $$
     from sale right join seanse on numer_sali=sea_sala) as foo on rez_seans=id_seansu where id_seansu=seans_var)
     as foo1 group by liczba_miejsc;
 $$ LANGUAGE 'sql';
-
-
-
-
 
 
 
