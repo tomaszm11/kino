@@ -3,7 +3,7 @@ import tkinter.font as font      # This lets us use different fonts.
 
 import psycopg2
 
-db=psycopg2.connect(host='localhost',user='postgres',password='datab427869',database='kino')
+db=psycopg2.connect(host='localhost',user='your username',password='your pswd',database='kino')
 c=db.cursor()
 
 def center_window_on_screen():
@@ -351,13 +351,20 @@ class Seanse():
             exec(f'self.lbl_time_{k[2]}=Label(self.show_seanse_frame,text=k[0]).grid(row=self.count1,column=0)')
             exec(f'self.lbl_room_{k[2]}=Label(self.show_seanse_frame,text=k[1]).grid(row=self.count1,column=1)')
             c.execute(f"select * from ocz_rezerwacje where rez_seans={k[2]}")
-            result=c.fetchall()
-            c.execute(f"select * from rezerwacje where rez_seans={k[2]}")
             result1=c.fetchall()
-            if result==[] or result1==[]:
+            c.execute(f"select * from rezerwacje where rez_seans={k[2]}")
+            result=c.fetchall()
+            if result==[] and result1==[]:
                 c.execute(f"select liczba_miejsc from sale where numer_sali={k[1]}")
                 exec(f'self.free_seats_{k[2]}=c.fetchall()')
-            else:
+            elif result!=[] and result1==[]:
+                c.execute(f'select sprawdz_miejsca({k[2]})')
+                exec(f'self.free_seats_{k[2]}=c.fetchall()')
+            elif result==[] and result1!=[]:
+                c.execute(f'select sprawdz_ocz_miejsca({k[2]})')
+                exec(f'self.free_seats_{k[2]}=c.fetchall()')
+
+            elif result!=[] and result1!=[]:
                 c.execute(f"select sprawdz_rezerwowane_miejsca({k[2]})")
                 exec(f'self.free_seats_{k[2]}=c.fetchall()')
             
