@@ -64,6 +64,15 @@ $$ LANGUAGE 'sql';
 
 
 
+CREATE OR REPLACE FUNCTION sprawdz_rezerwowane_miejsca (seans_var integer)
+RETURNS bigint AS $$
+	select (sprawdz_miejsca(seans_var) - SUM(zajmowane_miejsca)) AS result from 
+    (select id_ocz_rezerwacji,zajmowane_miejsca,numer_sali,liczba_miejsc,id_seansu 
+    from ocz_rezerwacje left join (select sale.numer_sali,sale.liczba_miejsc,seanse.id_seansu
+    from sale right join seanse on numer_sali=sea_sala) as foo on rez_seans=id_seansu where id_seansu=seans_var)
+    as foo1 group by liczba_miejsc;
+$$ LANGUAGE 'sql';
+
 
 
 
@@ -94,4 +103,3 @@ insert into Seanse(godzina_rozpoczecia, sea_film, sea_sala) values ('2023-01-19 
 insert into Seanse(godzina_rozpoczecia, sea_film, sea_sala) values ('2023-01-19 18:00:00','Fast and furious','4');
 insert into Seanse(godzina_rozpoczecia, sea_film, sea_sala) values ('2023-01-20 20:00:00','Terminator','2');
 insert into Seanse(godzina_rozpoczecia, sea_film, sea_sala) values ('2023-01-19 19:00:00','Fast and furious: Tokyo drift','5');
-
