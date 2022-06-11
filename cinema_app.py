@@ -1,9 +1,9 @@
 from tkinter import *             # This has all the code for GUIs.
-import tkinter.font as font      # This lets us use different fonts.
+
 
 import psycopg2
 
-db=psycopg2.connect(host='localhost',user='your username',password='your pswd',database='kino')
+db=psycopg2.connect(host='localhost',user='username',password='your pswd',database='kino')
 c=db.cursor()
 
 def center_window_on_screen():
@@ -106,6 +106,7 @@ class Admin():
         self.lbl_admin=Label(self.admin_frame,text='Select an option:').pack()
         self.btn_admin_accept_req=Button(self.admin_frame,text='Review orders',command=self.switch_to_accept).pack()
         self.btn_admin_add_seans=Button(self.admin_frame,text='Add Seances',command=self.switch_to_add_seans).pack()
+        self.btn_admin_add_movie=Button(self.admin_frame,text='Add Movies',command=self.switch_to_add_movie).pack()
         self.btn_admin_add_admin=Button(self.admin_frame,text='Add staff members',command=self.switch_to_add_admin).pack()
         self.btn_admin_back=Button(self.admin_frame,text='<- Back',command=self.back_to_login).pack()
     def switch_to_accept(self):
@@ -114,6 +115,9 @@ class Admin():
     def switch_to_add_seans(self):
         self.admin_frame.forget()
         Add_seanse(root)
+    def switch_to_add_movie(self):
+        self.admin_frame.forget()
+        Add_movie(root)
     def switch_to_add_admin(self):
         self.admin_frame.forget()
         Add_admin(root)
@@ -254,6 +258,45 @@ class Add_seanse():
         self.add_seanse_frame.forget()
         Admin(root)
 
+class Add_movie():
+    def __init__(self,master):
+        self.add_movie_frame=Frame(master)
+        self.add_movie_frame.pack()
+
+        self.lbl_add_movie=Label(self.add_movie_frame,text='Add movie').pack()
+
+        self.lbl_title=Label(self.add_movie_frame,text='Title:').pack()
+        self.e_add_title=Entry(self.add_movie_frame)
+        self.e_add_title.pack()
+
+        self.lbl_time=Label(self.add_movie_frame,text="Showing time (in minutes):").pack()
+        self.e_add_time=Entry(self.add_movie_frame)
+        self.e_add_time.pack()
+
+        self.lbl_desc=Label(self.add_movie_frame,text="Description:").pack()
+        self.e_add_desc=Entry(self.add_movie_frame)
+        self.e_add_desc.pack()
+
+        self.lbl_year=Label(self.add_movie_frame,text="Year of production:").pack()
+        self.e_add_year=Entry(self.add_movie_frame)
+        self.e_add_year.pack()
+        self.btn_add=Button(self.add_movie_frame,text="Add seance",command=self.add).pack()
+
+        
+
+        self.btn_add_seans_back=Button(self.add_movie_frame,text='<- Back',command=self.back_to_admin).pack()
+
+    def add(self):
+        title=self.e_add_title.get()
+        time=self.e_add_time.get()
+        year=self.e_add_year.get()
+        desc=self.e_add_desc.get()
+        c.execute('INSERT INTO filmy values (title,time,desc,year)')
+        # this is needs a bit more restrictions i guess
+    def back_to_admin(self):
+        self.add_movie_frame.forget()
+        Admin(root)
+      
 
 class Add_admin():
     def __init__(self,master):
