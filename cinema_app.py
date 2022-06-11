@@ -1,11 +1,9 @@
-
-
 from tkinter import *             # This has all the code for GUIs.
 import tkinter.font as font      # This lets us use different fonts.
 
 import psycopg2
 
-db=psycopg2.connect(host='localhost',user='postgres',password='your pswd',database='kino')
+db=psycopg2.connect(host='localhost',user='postgres',password='datab427869',database='kino')
 c=db.cursor()
 
 def center_window_on_screen():
@@ -139,9 +137,11 @@ class Accept():
 
         #i need to name my buttons, but exec() doesnt allow the 'lambda res=res' trick.
         #button dictionary sounds weird but works
-        self.button_dict={}
+        self.button_dict_ac={}
+        self.button_dict_dec={}
         for res in pending:
-            self.button_dict[f'btn_accept{res[0]}']=Button(self.accept_frame,text='Accept',command=lambda res=res: self.accept(res))
+            self.button_dict_ac[f'btn_accept{res[0]}']=Button(self.accept_frame,text='Accept',command=lambda res=res: self.accept(res))
+            self.button_dict_dec[f'btn_decline{res[0]}']=Button(self.accept_frame,text='Decline',command=lambda res=res: self.decline(res))
 
         count=2
         for res in pending:
@@ -166,20 +166,36 @@ class Accept():
             exec(f'self.lbl_accept_free_seats{res[0]}=Label(self.accept_frame,text=self.free_seats_{res[0]})')
             exec(f'self.lbl_accept_free_seats{res[0]}.grid(row=count,column=3)')
 
+            
+
             #using the button dicitonary
 
-            self.button_dict[f'btn_accept{res[0]}'].grid(row=count,column=4)
+            self.button_dict_ac[f'btn_accept{res[0]}'].grid(row=count,column=4)
+            self.button_dict_dec[f'btn_decline{res[0]}'].grid(row=count,column=5)
+            
 
             count+=1
         self.btn_accept_back=Button(self.accept_frame,text='powrot do wyboru',command=self.back_to_admin).grid(row=count,column=0)
     def accept(self,res):
+        
+        
         c.execute(f"insert into rezerwacje values ('{res[0]}','{res[1]}','{res[2]}')")
+        #ideally we would want to delete a reviewed order from 'awaiting orders' table, but that adds free seats in the Seanse section,
+        #which is not a good thing
+        
         c.execute(f"delete from ocz_rezerwacje where id_ocz_rezerwacji='{res[0]}'")
+        
+        
+        
         #reloading to update seats taken
         self.accept_frame.destroy()
         Accept(root)
 
-        
+    def decline(self,res):
+        c.execute(f"delete from ocz_rezerwacje where id_ocz_rezerwacji='{res[0]}'")
+        self.accept_frame.destroy()
+        Accept(root)
+
     
     def back_to_admin(self):
         self.accept_frame.forget()
@@ -334,14 +350,15 @@ class Seanse():
             
             exec(f'self.lbl_time_{k[2]}=Label(self.show_seanse_frame,text=k[0]).grid(row=self.count1,column=0)')
             exec(f'self.lbl_room_{k[2]}=Label(self.show_seanse_frame,text=k[1]).grid(row=self.count1,column=1)')
-            c.execute(f"select * from rezerwacje where rez_seans={k[2]}")
+            c.execute(f"select * from ocz_rezerwacje where rez_seans={k[2]}")
             result=c.fetchall()
-            
-            if result==[]:
+            c.execute(f"select * from rezerwacje where rez_seans={k[2]}")
+            result1=c.fetchall()
+            if result==[] or result1==[]:
                 c.execute(f"select liczba_miejsc from sale where numer_sali={k[1]}")
                 exec(f'self.free_seats_{k[2]}=c.fetchall()')
             else:
-                c.execute(f"select sprawdz_miejsca({k[2]})")
+                c.execute(f"select sprawdz_rezerwowane_miejsca({k[2]})")
                 exec(f'self.free_seats_{k[2]}=c.fetchall()')
             
             exec(f'self.lbl_free_seats_{k[2]}=Label(self.show_seanse_frame,text=self.free_seats_{k[2]}[0]).grid(row=self.count1,column=2)')
@@ -351,10 +368,10 @@ class Seanse():
             # Button is not in exec because for some reason
             # exec doesn't allow the 'lambda k=k' trick. 
             # Luckily buttons dont have to be distinguishible
-            Button(self.show_seanse_frame,text="Reserve",command= lambda k=k: self.reserve(k[2])).grid(row=self.count1,column=4)
+            Button(self.show_seanse_frame,text="Reserve",command= lambda k=k: self.reserve(k[2],title)).grid(row=self.count1,column=4)
             self.count1+=1
         self.btn_show_seans_back=Button(self.show_seanse_frame,text='<- Back',command=self.sh_back).grid(row=100,column=2)
-    def reserve(self,id):
+    def reserve(self,id,title):
         
         
         #temporary solution to put data inside if statement
@@ -371,13 +388,19 @@ class Seanse():
             
             self.lbl_res_err.grid(row=101,column=0,columnspan=5)
         else:
-        
+            exec(f'print(self.free_seats_{id}[0][0])')
             c.execute(f"insert into ocz_rezerwacje(zajmowane_miejsca,rez_seans) values('{a[0]}','{id}') returning id_ocz_rezerwacji")
             pending=c.fetchall()
             exec(f'self.e_seats_{id}.delete(0,END)')
             exec(f'self.e_seats_{id}.insert(0,"Zarezerwowano!")')
+            #reloading to update available seats
+            self.show_seanse_frame.destroy()
+            self.show_seans(title)
+            
             Label(self.show_seanse_frame,text="Your order is waiting for staff member to review.").grid(row=self.count1,column=0,columnspan=5)
             Label(self.show_seanse_frame,text=f"Your reservation number is {pending[0][0]}").grid(row=self.count1+1,column=0,columnspan=5)
+
+          
 
 
 
