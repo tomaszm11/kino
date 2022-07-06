@@ -292,6 +292,7 @@ class Add_movie():
         year=self.e_add_year.get()
         desc=self.e_add_desc.get()
         c.execute("INSERT INTO filmy values ('{a}','{b}','{c}','{d}')".format(a=title,b=time,c=description,d=year))
+        self.lbl_add_mv_done=Label(self.add_movie_frame,text='Movie {} has been added successfully'.format(title)).pack()
         # this is needs a bit more restrictions i guess
     def back_to_admin(self):
         self.add_movie_frame.forget()
