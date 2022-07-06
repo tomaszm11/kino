@@ -291,7 +291,7 @@ class Add_movie():
         time=self.e_add_time.get()
         year=self.e_add_year.get()
         desc=self.e_add_desc.get()
-        c.execute('INSERT INTO filmy values (title,time,desc,year)')
+        c.execute("INSERT INTO filmy values ('{a}','{b}','{c}','{d}')".format(a=title,b=time,c=description,d=year))
         # this is needs a bit more restrictions i guess
     def back_to_admin(self):
         self.add_movie_frame.forget()
