@@ -3,7 +3,8 @@ from tkinter import *             # This has all the code for GUIs.
 
 import psycopg2
 
-db=psycopg2.connect(host='localhost',user='username',password='your pswd',database='kino')
+db=psycopg2.connect(host='localhost',user='postgres',password='datab427869',database='postgres')
+
 c=db.cursor()
 
 def center_window_on_screen():
@@ -38,16 +39,24 @@ class Start():
         self.start_frame.pack()
         
 
-        self.lbl_heading_start = Label(self.start_frame,
-                                    text='Welcome to the cinema')
-        self.lbl_heading_start.pack(pady=20)
-        self.lbl_login_start_log=Label(self.start_frame,text='Login for staff').pack()
-        self.login_btn_start=Button(self.start_frame,text='Login',command=self.switch_to_login)
-        self.login_btn_start.pack()
+        self.lbl_heading_start = Label(self.start_frame,text='Welcome to the cinema')
+        self.lbl_heading_start.pack()
         self.lbl_login_start_use=Label(self.start_frame,text='Browse movies and Seances').pack()
         self.seans_btn_start=Button(self.start_frame,text='Browse',command=self.switch_to_seanse)
         
         self.seans_btn_start.pack()
+        
+        self.lbl_start_view=Label(self.start_frame,text='Check reservation status').pack()
+        self.btn_start_view=Button(self.start_frame,text='Check',command=self.switch_to_check).pack()
+
+        self.lbl_login_start_log=Label(self.start_frame,text='Login for staff').pack()
+        self.login_btn_start=Button(self.start_frame,text='Login',command=self.switch_to_login)
+        self.login_btn_start.pack()
+
+    def switch_to_check(self):
+        self.start_frame.forget()
+        Check(root)
+        
     
 
     def switch_to_login(self):
@@ -57,6 +66,65 @@ class Start():
     def switch_to_seanse(self):
         self.start_frame.forget()
         Seanse(root)
+
+class Check():
+    def __init__(self,master):
+        self.check_frame=Frame(master)
+        self.check_frame.pack()
+
+        self.lbl_check=Label(self.check_frame,text='Enter your reservation number').grid(row=0,column=0,columnspan=2)
+        self.e_check=Entry(self.check_frame)
+        self.e_check.grid(row=1,column=0)
+        self.btn_check=Button(self.check_frame,text='OK',command=self.check).grid(row=1,column=1)
+        self.btn_back=Button(self.check_frame,text='<- Back',command= self.back_to_start).grid(row=100)
+#these labels are defined here but used in another function (check)
+        #I have no idea why but apparently if a widget is defined inside a function
+        #then it cannot be removed with .grid_forget().
+        #tkinter is a bit buggy
+
+        self.lbl_check_acc=Label(self.check_frame,text='Your reservation has been accepted')
+        self.lbl_check_table=Label(self.check_frame,text='ID   Seats taken    Movie title     Date and time    Room nr.')
+        self.lbl_check_pen=Label(self.check_frame,text='Your reservation is pending acceptance')
+        self.lbl_check_declined=Label(self.check_frame,text='Your reservation has been declined or it never existed.')
+    def check(self):
+        id=int(self.e_check.get())
+        
+        
+        
+        
+
+
+        
+        c.execute("select id_rezerwacji, zajmowane_miejsca, sea_film, godzina_rozpoczecia, sea_sala  from rezerwacje join seanse on rez_seans=id_seansu where id_rezerwacji='{}'".format(id))
+        res=c.fetchall()
+        c.execute("select id_ocz_rezerwacji, zajmowane_miejsca, sea_film, godzina_rozpoczecia, sea_sala  from ocz_rezerwacje join seanse on rez_seans=id_seansu where id_ocz_rezerwacji='{}'".format(id))
+        ocz_res=c.fetchall()
+        
+        if res!=[] and ocz_res==[]:
+            self.lbl_check_declined.grid_forget()
+            self.lbl_check_acc.grid(row=2,column=1,columnspan=3)
+            self.lbl_check_table.grid(row=3,column=0,columnspan=4)
+            self.lbl_check_show=Label(self.check_frame,text=f'{res[0][0]}    {res[0][1]}     {res[0][2]}    {res[0][3]}     {res[0][4]}')
+            self.lbl_check_show.grid(row=4,column=0,columnspan=5)
+            
+        elif res==[] and ocz_res!=[]:
+            self.lbl_check_declined.grid_forget()
+            self.lbl_check_pen.grid(row=2,column=1,columnspan=3)
+            self.lbl_check_table.grid(row=3,column=0,columnspan=4)
+            self.lbl_check_show=Label(self.check_frame,text=f'{res[0][0]}    {res[0][1]}     {res[0][2]}    {res[0][3]}     {res[0][4]}')
+            self.lbl_check_show.grid(row=4,column=0,columnspan=5)
+        elif res==[] and ocz_res==[]:
+            self.lbl_check_show.grid_forget()
+            self.lbl_check_pen.grid_forget()
+            self.lbl_check_acc.grid_forget()
+            
+            self.lbl_check_table.grid_forget()
+            self.lbl_check_declined.grid(row=2,columnspan=5)
+            
+    def back_to_start(self):
+        self.check_frame.destroy()
+        Start(root)
+            
 
 class Login():
     def __init__(self,master):
@@ -108,6 +176,7 @@ class Admin():
         self.btn_admin_add_seans=Button(self.admin_frame,text='Add Seances',command=self.switch_to_add_seans).pack()
         self.btn_admin_add_movie=Button(self.admin_frame,text='Add Movies',command=self.switch_to_add_movie).pack()
         self.btn_admin_add_admin=Button(self.admin_frame,text='Add staff members',command=self.switch_to_add_admin).pack()
+        self.btn_admin_res=Button(self.admin_frame,text='See reservations',command=self.switch_to_res).pack()
         self.btn_admin_back=Button(self.admin_frame,text='<- Back',command=self.back_to_login).pack()
     def switch_to_accept(self):
         self.admin_frame.forget()
@@ -121,9 +190,22 @@ class Admin():
     def switch_to_add_admin(self):
         self.admin_frame.forget()
         Add_admin(root)
+    def switch_to_res(self):
+        self.admin_frame.forget()
+        Reservations(root)
     def back_to_login(self):
         self.admin_frame.forget()
         Login(root)
+
+class Reservations():
+    def __init__(self,master):
+        self.res_frame=Frame(master)
+        self.res_frame.pack()
+        Label(self.res_frame,text='ID   Seats taken    Movie title     Date and time    Room nr.').pack()
+        c.execute("select id_rezerwacji, zajmowane_miejsca, sea_film, godzina_rozpoczecia, sea_sala from rezerwacje join seanse on rez_seans=id_seansu")
+        for i in c.fetchall():
+            Label(self.res_frame,text=i).pack()
+
 
 class Accept():
     
@@ -179,7 +261,7 @@ class Accept():
             
 
             count+=1
-        self.btn_accept_back=Button(self.accept_frame,text='powrot do wyboru',command=self.back_to_admin).grid(row=count,column=0)
+        self.btn_accept_back=Button(self.accept_frame,text='<- Back',command=self.back_to_admin).grid(row=count,column=0)
     def accept(self,res):
         
         
@@ -290,10 +372,11 @@ class Add_movie():
         title=self.e_add_title.get()
         time=self.e_add_time.get()
         year=self.e_add_year.get()
-        desc=self.e_add_desc.get()
+        description=self.e_add_desc.get()
+        
         c.execute("INSERT INTO filmy values ('{a}','{b}','{c}','{d}')".format(a=title,b=time,c=description,d=year))
+        # this needs a bit more restrictions i guess
         self.lbl_add_mv_done=Label(self.add_movie_frame,text='Movie {} has been added successfully'.format(title)).pack()
-        # this is needs a bit more restrictions i guess
     def back_to_admin(self):
         self.add_movie_frame.forget()
         Admin(root)
@@ -435,10 +518,10 @@ class Seanse():
         
         self.lbl_res_err.grid_forget()
         # and the data gets written in a weird way. I'll leave it as is since im not using it anywhere else
-        if int(a[0])>b[0][0][0]:
+        if int(a[0])>b[0][0][0] and int(a[0])>0:
             
             self.lbl_res_err.grid(row=101,column=0,columnspan=5)
-        else:
+        elif int(a[0])<=b[0][0][0] and int(a[0])>0:
             exec(f'print(self.free_seats_{id}[0][0])')
             c.execute(f"insert into ocz_rezerwacje(zajmowane_miejsca,rez_seans) values('{a[0]}','{id}') returning id_ocz_rezerwacji")
             pending=c.fetchall()
@@ -450,6 +533,9 @@ class Seanse():
             
             Label(self.show_seanse_frame,text="Your order is waiting for staff member to review.").grid(row=self.count1,column=0,columnspan=5)
             Label(self.show_seanse_frame,text=f"Your reservation number is {pending[0][0]}").grid(row=self.count1+1,column=0,columnspan=5)
+        elif int(a[0])<=0:
+            self.show_seanse_seaterr_lbl=Label(self.show_seanse_frame,text='Number of seats must be a positive integer!').grid(row=102,column=0,columnspan=5)
+            
 
           
 
